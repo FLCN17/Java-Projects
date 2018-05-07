@@ -150,37 +150,37 @@ public class DieStats {
 	}
 
 	public static void dieClassicalCombo(int numDie) {
-		int[] results = null, die = new int[numDie], sides = new int[numDie];
-		int rolls = 0, resultsIndex = 0;
+		int[] results = null, die = new int[numDie];
+		int resultSize = 0, totalOutcomes = 1;
 		
+		//get sides of die
 		for(int i = 0; i < numDie; i++) {
-			die[i] = 0;
-			System.out.printf("How many sides for die %d: ", i+1);
-			sides[i] = keyboard.nextInt(); keyboard.nextLine();
-			rolls += sides[i];
+			System.out.printf("Please enter sides for die #%d", i+1);
+			die[i] = keyboard.nextInt(); keyboard.nextLine();
+			resultSize += die[i];
+			totalOutcomes *= die[i]; 
 		}
-		results = new int[rolls-(numDie - 1)];
-		for(int i = 0; i < results.length; i++)
-			results[i] = 0;
-		for(int i = 0; i < results.length; i++) {
-			for(int j = 0; j < die.length; j++) {
-				if(die[j] == sides[j]-1) {
-					die[j] = 0;
-					if(j != numDie-1) {
-						die[j+1]++;
-					}
-				}
-				die[j]++;
-			}
-			for(int j = 0; j < die.length; j++) {
-				resultsIndex += die[j];
-			}
-			results[resultsIndex]++;
-			resultsIndex = 0;
+		resultSize -= (numDie-1);
+		results = new int[resultSize]; results[0] = 1; //set the starting 'seed'
+		for(int i = 0; i < die.length; i++) {
+			results = new int[resultSize];
+			//grab current die sides, pop into the array maker
+			//and pop out new array until we hit the end.
+			results = classicRoller(die[i], i+1, results);
 		}
+		//get prob from all the results
 		
-		for(int i = 0; i < results.length; i++)
-			System.out.printf("Classical percentage of total for roll of %d: %.4f%s\n", numDie + i , ((double)results[i]/(double)rolls*100), "%");
+		for(int i = 0; i < results.length; i++) {
+			System.out.printf("Classical percentage of total for roll of %d: %.4f%s\n", numDie + i , ((double)results[i]/(double)totalOutcomes*100), "%");
+		}
 	}
-
+	
+	private static int[] classicRoller(int sides, int curDie, int[] array) {
+		int[] newArray = new int[array.length];
+		int j = 0;
+		for(int i = 0; i < sides; i++) {
+			newArray[i] += array[j++%sides];
+		}
+		return newArray;
+	}
 }
