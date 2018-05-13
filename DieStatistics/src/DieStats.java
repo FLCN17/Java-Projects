@@ -2,7 +2,9 @@ import java.util.Scanner;
 
 /** DieStats
  * @author cory
- * produces the classical and empirical probabilities of rolls of dice
+ * 5/13/18
+ * produces the classical and empirical probabilities of rolls of dice, as well as average roll. 
+ * The number of sides can be different or the same.
  */
 public class DieStats {
 
@@ -86,6 +88,8 @@ public class DieStats {
 		for(int i = 0; i < tally.length; i++)
 			System.out.printf("Percentage of total for roll of %d: %.4f%s\n", numDie + i , ((double)tally[i]/(double)numRolls)*100, "%");
 		System.out.printf("Average roll: %.4f\n", xBar/numRolls);
+		
+		//option to pop result into file for further processing
 	}
 	
 	
@@ -101,7 +105,7 @@ public class DieStats {
 			totalSides += numSides;
 		}
 		
-		int[] tally = new int[((totalSides)-(numDie - 1))]; //ISSUES AHEAD
+		int[] tally = new int[((totalSides)-(numDie - 1))];
 		System.out.println("Working");
 		for(int i = 0; i < tally.length; i++) //set your accumulator to 0
 			tally[i] = 0;
@@ -121,66 +125,70 @@ public class DieStats {
 		for(int i = 0; i < tally.length; i++)
 			System.out.printf("Percentage of total for roll of %d: %.4f%s\n", numDie + i , ((double)tally[i]/(double)numRolls)*100, "%");
 		System.out.printf("Average roll: %.4f\n", xBar/numRolls);
+		
+		//option to pop result into file for further processing
 	}
 	
 	
 	public static void dieClassical(int numSides, int numDie) {
-		int[] results = new int[((numSides * numDie)-(numDie - 1))];
-		for(int i = 0; i < results.length; i++) //set your accumulator to 0
-			results[i] = 0;
-		switch(numDie) {
-		case 1:
-			for(int x = 0; x < numSides; x++) 
-				results[x]++;
-			break;
-		case 2:
-			for(int x = 0; x < numSides; x++) 
-				for(int y = 0; y < numSides; y++) 
-					results[x+y]++;
-			break;
-		case 3:
-			for(int x = 0; x < numSides; x++) 
-				for(int y = 0; y < numSides; y++) 
-					for(int z = 0; z < numSides; z++) 
-						results[x+y+z]++;
-			break;
+		int[] results = new int[] {1}, die = new int[numDie];
+		double xBar = 0;
+		int totalOutcomes = 1, resultsLength = 1;
+		//get sides of die
+		for(int i = 0; i < numDie; i++) {
+			die[i] = numSides;
+			totalOutcomes *= die[i]; 
 		}
-		for(int i = 0; i < results.length; i++)
-			System.out.printf("Classical percentage of total for roll of %d: %.4f%s\n", numDie + i , ((double)results[i]/(double)Math.pow(numSides, numDie))*100, "%");
+		for(int i = 0; i < die.length; i++) {
+			for(int j = 0; j <= i; j++) 
+				resultsLength += die[j];
+			resultsLength -= i+1;
+			results = classicRoller(die[i], i, results, resultsLength);
+			resultsLength = 1;
+		}
+		//get prob from all the results
+		for(int i = 0; i < results.length; i++) {
+			System.out.printf("Classical percentage of total for roll of %d: %.4f%s\n", numDie + i , ((double)results[i]/(double)totalOutcomes*100), "%");
+			xBar += (results[i]*(numDie+i));
+			//do 68%/95%/99% values here too
+			//grab middle, keep adding sides until it is greater then 65%, then 95%. output ranges that we hit at max, and figure out the mirror
+		}
+		System.out.printf("Average roll: %.4f\n", xBar/totalOutcomes);
+		
+		//option to pop result into file for further processing
 	}
 
 	public static void dieClassicalCombo(int numDie) {
-		int[] results = null, die = new int[numDie];
-		int resultSize = 0, totalOutcomes = 1;
-		
+		int[] results = new int[] {1}, die = new int[numDie];
+		double xBar = 0;
+		int totalOutcomes = 1, resultsLength = 1;
 		//get sides of die
 		for(int i = 0; i < numDie; i++) {
-			System.out.printf("Please enter sides for die #%d", i+1);
+			System.out.printf("Please enter sides for die #%d: ", i+1);
 			die[i] = keyboard.nextInt(); keyboard.nextLine();
-			resultSize += die[i];
 			totalOutcomes *= die[i]; 
 		}
-		resultSize -= (numDie-1);
-		results = new int[resultSize]; results[0] = 1; //set the starting 'seed'
 		for(int i = 0; i < die.length; i++) {
-			results = new int[resultSize];
-			//grab current die sides, pop into the array maker
-			//and pop out new array until we hit the end.
-			results = classicRoller(die[i], i+1, results);
+			for(int j = 0; j <= i; j++) 
+				resultsLength += die[j];
+			resultsLength -= i+1;
+			results = classicRoller(die[i], i, results, resultsLength);
+			resultsLength = 1;
 		}
 		//get prob from all the results
-		
 		for(int i = 0; i < results.length; i++) {
 			System.out.printf("Classical percentage of total for roll of %d: %.4f%s\n", numDie + i , ((double)results[i]/(double)totalOutcomes*100), "%");
+			xBar += (results[i]*(numDie+i));
 		}
+		//option to pop result into file for further processing
+		System.out.printf("Average roll: %.4f\n", xBar/totalOutcomes);
 	}
 	
-	private static int[] classicRoller(int sides, int curDie, int[] array) {
-		int[] newArray = new int[array.length];
-		int j = 0;
-		for(int i = 0; i < sides; i++) {
-			newArray[i] += array[j++%sides];
-		}
+	private static int[] classicRoller(int sides, int curDie, int[] array, int resultLength) {
+		int[] newArray = new int[resultLength]; 
+		for(int i = 0; i < sides; i++) 
+			for(int j = 0; j < array.length; j++) 
+				newArray[i+j] += array[j];
 		return newArray;
 	}
 }
