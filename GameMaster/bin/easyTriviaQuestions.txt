@@ -1,0 +1,25 @@
+//DELETE BEFORE RUN - formatting -
+//question
+//answer1
+//answer2
+//answer3
+//answer4
+//correct
+Who invented the first re-programmable, digital computer?
+Alan Turing
+Raul Rojas
+Konrad Zuse
+Linus Torvald
+3
+Who was Alan Turing?
+First-team midfielder for Manchester United.
+The father of theoretical computer science.
+The true name of the Red Baron.
+19th century Scottish playwright.
+2
+Which 2017 release starred Gal Gadot?
+The Last Jedi
+Wonder Woman
+Blade Runner 2049
+Molly's Game
+2
