@@ -9,7 +9,8 @@ public class ADFGVXCipher {
 		Chart codeChart = null;
 		Scanner keyboard = new Scanner(System.in);
 		PrintWriter chartFile = new PrintWriter("ENCRYPTCHART.txt");
-		String codeDigits = "", message, phrase, cipherText = "", newChart = "", chartFileLoc;
+		String codeDigits = "", message, phrase, newChart = "", chartFileLoc;
+		String[] cipherText = null;
 		boolean validInput = false;
 		//encryption or decryption
 		do {
@@ -54,18 +55,19 @@ public class ADFGVXCipher {
 		}
 		
 		//System.out.print(codeDigits.charAt(0) == 65);
-		System.out.printf("%s", cipherText);
+		for(int i = 0; i < cipherText.length; i++)
+			System.out.printf("%s", cipherText[i]);
 		
 		keyboard.close();
 	}
 	
-	public static String Encryption(String clearText, String secretPhrase, Chart codeChart) {
-		String cipherText = "", sortedPhrase = "";
+	public static String[] Encryption(String clearText, String secretPhrase, Chart codeChart) {
+		String[] cipherText = new String[clearText.length()], sortedPhrase = new String[clearText.length()];
 		//strip whitespace
 		clearText.replace(" ", "");
 		//get Cartesian coords
 		for(int i = 0; i < clearText.length(); i++)
-			cipherText += codeChart.CodeReturn(clearText.toLowerCase().charAt(i));
+			cipherText[i] = codeChart.CodeReturn(clearText.toLowerCase().charAt(i));
 		//perform phrase sorting
 		
 		
